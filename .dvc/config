@@ -1,0 +1,4 @@
+[core]
+    remote = dummy
+['remote "dummy"']
+    url = /tmp/dvc_remote
