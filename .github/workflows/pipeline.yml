@@ -1,0 +1,70 @@
+# .github/workflows/pipeline.yml
+name: MLOps End-to-End Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Setup DVC
+        uses: iterative/setup-dvc@v1
+
+      - name: Pull Data
+        run: dvc pull
+
+      - name: Train
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        run: python src/train.py
+
+      - name: Persist
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-info
+          path: model_info.txt
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install MLflow functionality
+        run: pip install -r requirements.txt
+
+      - name: Download
+        uses: actions/download-artifact@v4
+        with:
+          name: model-info
+
+      - name: Logic
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        run: python check_threshold.py
+
+      - name: Containerize
+        run: |
+          RUN_ID=$(cat model_info.txt)
+          echo "Building Docker image for Run ID: $RUN_ID"
+          docker build --build-arg RUN_ID=$RUN_ID -t my-ml-app:$RUN_ID .
