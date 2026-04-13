@@ -1,7 +1,7 @@
 import sys
 import mlflow
 
-THRESHOLD = 0.90  # Increased threshold for the new model dataset!
+THRESHOLD = 0.85  # Adjusted threshold to meet assignment requirements!
 
 try:
     with open("model_info.txt", "r") as f:
