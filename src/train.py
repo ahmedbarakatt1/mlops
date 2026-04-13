@@ -23,7 +23,7 @@ with mlflow.start_run() as run:
     print(f"MLflow Run ID: {run_id}")
 
     # Train
-    model_variant = os.getenv("MODEL_VARIANT", "strong").strip().lower()
+    model_variant = os.getenv("MODEL_VARIANT", "weak").strip().lower()
     if model_variant == "weak":
         model = DummyClassifier(strategy="most_frequent")
         mlflow.log_param("model_variant", "weak")
