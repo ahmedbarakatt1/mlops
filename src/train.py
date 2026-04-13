@@ -15,7 +15,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # train the model and log parameters, metrics, and the model itself to MLflow
 print("Starting MLflow run...")
-mlflow.set_experiment("personal-mlops-project") 
+mlflow.set_experiment("personal-mlops-project")
 
 with mlflow.start_run() as run:
     # Save the Run ID for the automated pipeline
@@ -30,7 +30,9 @@ with mlflow.start_run() as run:
         mlflow.log_param("model_type", "DummyClassifier")
     else:
         n_estimators = 150
-        model = GradientBoostingClassifier(n_estimators=n_estimators, random_state=101)
+        model = GradientBoostingClassifier(
+            n_estimators=n_estimators, random_state=101
+        )
         mlflow.log_param("model_variant", "strong")
         mlflow.log_param("model_type", "GradientBoostingClassifier")
         mlflow.log_param("n_estimators", n_estimators)
